@@ -1,4 +1,4 @@
-// File: C:\Users\TimR\Downloads\doppel-landing-updated\landing_project\app\chat\page.tsx
+// File: C:\Users\TimR\Code\doppel-landing-updated\landing_project\app\chat\page.tsx
 import * as entry from '../../../../app/chat/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

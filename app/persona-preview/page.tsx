@@ -60,9 +60,9 @@ export default function PersonaPreviewPage() {
       emojiEnergy ? `emoji energy: ${emojiEnergy}` : null,
       copingStyle ? `when struggling: ${copingStyle}` : null,
       interests ? `into: ${interests}` : null,
-    ].filter(Boolean)
+    ].filter((q): q is string => Boolean(q))
 
-    const systemPrompt = buildSystemPrompt(
+    const systemPrompt = buildSystemPrompt({
       textingStyle,
       phrases,
       age,
@@ -70,7 +70,10 @@ export default function PersonaPreviewPage() {
       copingStyle,
       interests,
       avoidPhrases,
-    )
+      tone,
+      values,
+      quirks,
+    })
 
     const generatedPersona: PersonaData = {
       tone,
@@ -86,7 +89,7 @@ export default function PersonaPreviewPage() {
   }
 
   const extractValuesFromAnswers = (answers: Record<string, any>) => {
-    const values = []
+    const values: string[] = []
 
     if (answers.vibe_when_struggling === "rant to close friends") values.push("connection", "openness")
     if (answers.vibe_when_struggling === "journal or overthink") values.push("self-reflection", "depth")
@@ -109,21 +112,49 @@ export default function PersonaPreviewPage() {
     return quirks.slice(0, 3)
   }
 
-  const buildSystemPrompt = (
-    textingStyle: string,
-    phrases: string,
-    age: number,
-    emojiEnergy: string,
-    copingStyle: string,
-    interests: string,
-    avoidPhrases: string,
-  ) => {
-    let prompt = `You are my digital twin. You're ${age} years old with a ${textingStyle} texting style.`
+  type BuildPromptInput = {
+    textingStyle?: string
+    phrases?: string
+    age?: number
+    emojiEnergy?: string
+    copingStyle?: string
+    interests?: string
+    avoidPhrases?: string
+    tone?: string
+    values?: string[]
+    quirks?: string[]
+  }
 
+  const buildSystemPrompt = (opts: BuildPromptInput) => {
+    const {
+      textingStyle,
+      phrases,
+      age,
+      emojiEnergy,
+      copingStyle,
+      interests,
+      avoidPhrases,
+      tone,
+      values,
+      quirks,
+    } = opts
+
+    let prompt = `You are my digital twin.`
+
+    if (typeof age !== "undefined" || textingStyle) {
+      const agePart = typeof age !== "undefined" ? `${age} years old` : undefined
+      const stylePart = textingStyle ? `a ${textingStyle} texting style` : undefined
+      const parts = [agePart, stylePart].filter(Boolean).join(" with ")
+      if (parts) prompt += ` You're ${parts}.`
+    }
+
+    if (tone) prompt += ` Your communication tone: ${tone}.`
     if (phrases) prompt += ` You often use phrases like: ${phrases}.`
     if (emojiEnergy) prompt += ` Your emoji energy: ${emojiEnergy}.`
     if (copingStyle) prompt += ` When going through it, you ${copingStyle}.`
     if (interests) prompt += ` You're into: ${interests}.`
+    if (Array.isArray(values) && values.length) prompt += ` Core values: ${values.join(", ")}.`
+    if (Array.isArray(quirks) && quirks.length) prompt += ` Quirks: ${quirks.join(", ")}.`
     if (avoidPhrases) prompt += ` You'd never say: ${avoidPhrases}.`
 
     prompt += ` Speak as 'I' naturally. Be authentic to this personality. Keep responses conversational and real.`
@@ -134,9 +165,31 @@ export default function PersonaPreviewPage() {
   const handleSave = () => {
     if (!editedPersona) return
 
-    const updatedPersona = {
+    // Try to enrich the prompt with original quiz answers if available
+    const quizRaw = typeof window !== "undefined" ? localStorage.getItem("dd_mirror_v1_quiz") : null
+    let quiz: Record<string, any> | null = null
+    if (quizRaw) {
+      try {
+        quiz = JSON.parse(quizRaw)
+      } catch {
+        quiz = null
+      }
+    }
+
+    const updatedPersona: PersonaData = {
       ...editedPersona,
-      systemPrompt: buildSystemPrompt(editedPersona.tone, editedPersona.values, editedPersona.quirks, [], 22, "😊"), // Default values added to match new buildSystemPrompt signature
+      systemPrompt: buildSystemPrompt({
+        tone: editedPersona.tone,
+        values: editedPersona.values,
+        quirks: editedPersona.quirks,
+        textingStyle: quiz?.texting_style,
+        phrases: quiz?.phrases,
+        age: typeof quiz?.age === "number" ? quiz!.age : undefined,
+        emojiEnergy: quiz?.emoji_energy,
+        copingStyle: quiz?.vibe_when_struggling,
+        interests: quiz?.interests,
+        avoidPhrases: quiz?.never_say,
+      }),
     }
 
     setPersona(updatedPersona)

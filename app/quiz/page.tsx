@@ -29,7 +29,7 @@ const QUIZ_QUESTIONS = [
     id: "phrases",
     title: "What words or phrases do you use a lot?",
     type: "text",
-    placeholder: 'e.g., "bruh", "deadass", "no shot", "lmao", "real"',
+    placeholder: 'e.g., "bruh", "no shot", "lmao", "real"',
     helper: "Share 1-3 phrases you use regularly",
   },
   {
@@ -56,7 +56,7 @@ const QUIZ_QUESTIONS = [
     id: "interests",
     title: "What are you into lately?",
     type: "text",
-    placeholder: "e.g., gaming, gym, situationships, scrolling, music, hoops, etc.",
+    placeholder: "e.g., gaming, gym, situationships, scrolling, music, etc.",
     helper: "Share what's been occupying your time and thoughts",
   },
   {
