@@ -75,6 +75,7 @@ export default function ChatPage() {
     }
     const base = [...messages, userMessage]
     setMessages(base)
+  saveSession(base)
     setInput("")
     setIsLoading(true)
     setError(null)
@@ -83,39 +84,30 @@ export default function ChatPage() {
       // persona/system prompt from localStorage
       const persona = JSON.parse(localStorage.getItem("dd_mirror_v1_persona") || "{}")
       const systemPrompt: string = persona?.systemPrompt || ""
+      console.info("[Chat] System prompt:", systemPrompt)
 
       // payload for server route
       const apiMessages = base.map(({ role, content }) => ({ role, content }))
-
       const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          system: systemPrompt,
-          messages: apiMessages,
-          model: persona?.model || "@preset/dopple-prototype",
-        }),
-      })
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            system: systemPrompt,
+            messages: apiMessages,
+          }),
+        });
 
-      if (!res.ok) {
-        let msg = `HTTP ${res.status}`
-        try {
-          const j = await res.json()
-          if (j?.error) msg = j.error
-        } catch {}
-        throw new Error(msg)
-      }
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `HTTP ${res.status}`);
+    }
 
-      // create a placeholder assistant message we’ll stream into
+    const contentType = res.headers.get("content-type") || "";
+    if (contentType.includes("text/event-stream")) {
+      // streaming path
       const assistantId = `assistant_${Date.now()}`
-      setMessages(prev => [...prev, {
-        id: assistantId,
-        role: "assistant",
-        content: "",
-        timestamp: new Date(),
-      }])
+      setMessages(prev => [...prev, { id: assistantId, role: "assistant", content: "", timestamp: new Date() }])
 
-      // stream SSE tokens and update the last message
       const reader = res.body?.getReader()
       const decoder = new TextDecoder()
       let buf = ""
@@ -126,7 +118,6 @@ export default function ChatPage() {
           if (done) break
           buf += decoder.decode(value, { stream: true })
 
-          // parse by lines
           const lines = buf.split("\n")
           for (let i = 0; i < lines.length - 1; i++) {
             const line = lines[i].trim()
@@ -148,36 +139,23 @@ export default function ChatPage() {
           }
           buf = lines[lines.length - 1]
         }
-      } else {
-        // non-stream fallback
-        const text = await res.text()
-        setMessages(prev => {
-          const copy = [...prev]
-          const idx = copy.findIndex(m => m.id === assistantId)
-          if (idx !== -1) copy[idx] = { ...copy[idx], content: text || "..." }
-          return copy
-        })
       }
 
-      // persist
-      saveSession(
-        // ensure timestamps are serializable
-        (prev => prev)([] as Message[]), // TS appeaser (no-op)
-      )
-      saveSession(
-        (messagesRef => messagesRef)([] as Message[]) // also a no-op (the next line saves real state)
-      )
-      saveSession(
-        (curr => curr)(JSON.parse(JSON.stringify(
-          ((): Message[] => {
-            // pull latest state from closure-less read
-            const el = document.getElementById("state-snapshot")
-            return []
-          })()
-        )))
-      )
-      // simpler: just read from state after a microtask
-      queueMicrotask(() => saveSession(getCurrentStateSafe()))
+      // persist final state after stream
+      queueMicrotask(() => saveSession((messages as Message[])))
+    } else {
+      // JSON path
+      const data = await res.json();
+      const assistantMessage: Message = {
+        id: `assistant_${Date.now()}`,
+        role: "assistant",
+        content: data.content || "",
+        timestamp: new Date(),
+      };
+      const updated = [...base, assistantMessage]
+      setMessages(updated)
+      saveSession(updated)
+    }
 
       track("message_sent"); track("message_received")
     } catch (e: any) {
@@ -188,15 +166,7 @@ export default function ChatPage() {
     }
   }
 
-  // helper to safely capture current messages state
-  function getCurrentStateSafe(): Message[] {
-    // We can’t read state synchronously here reliably; rehydrate from DOM-less copy:
-    // Fallback: rely on setMessages callback above. If you want bulletproof,
-    // move saveSession() into each setMessages(...) where we mutate.
-    try {
-      return (messages as Message[]).map(m => ({ ...m }))
-    } catch { return [] }
-  }
+  // (removed stale state snapshot helper; persisting happens alongside state updates)
 
   function track(name: string) {
     const settings = JSON.parse(localStorage.getItem("dd_mirror_v1_settings") || '{"analytics": true}')
