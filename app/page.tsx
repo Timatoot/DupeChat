@@ -249,6 +249,100 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Future Plans Section */}
+      <section className="py-20 px-4 bg-slate-50 dark:bg-slate-900">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+              What's Coming Next
+            </h2>
+            <p className="text-lg text-slate-600 dark:text-slate-300">
+              DupeChat is just getting started. Here's what we're working on to make your AI twin even better.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            <Card className="border-0 shadow-lg">
+              <CardContent className="p-8">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mb-6">
+                  <Zap className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">Enhanced AI Models</h3>
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+                  Upgrading to more advanced paid models for better conversations, deeper understanding, and more nuanced responses that truly capture your unique voice.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-0 shadow-lg">
+              <CardContent className="p-8">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mb-6">
+                  <Users className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">Better Personality Capture</h3>
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+                  Refined prompts and setup process to better represent diverse communication styles, backgrounds, and personalities with greater accuracy.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-0 shadow-lg">
+              <CardContent className="p-8">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-6">
+                  <Brain className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">Enhanced Context System</h3>
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+                  A more sophisticated setup that gives your AI twin deeper context and memory, making conversations feel even more authentic and personal.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-0 shadow-lg">
+              <CardContent className="p-8">
+                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mb-6">
+                  <Sparkles className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">Redesigned Experience</h3>
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+                  A completely refined and likely redesigned UI that's more intuitive, beautiful, and creates an even better conversation experience.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="text-center mt-12">
+            <p className="text-slate-600 dark:text-slate-400 italic">
+              Currently running on free models while I'm a broke uni student 😅 - but big improvements are coming!
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact & Portfolio Section */}
+      <section className="py-16 px-4 bg-white dark:bg-slate-800">
+        <div className="container mx-auto max-w-3xl text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4">
+            Built by a Developer Who Cares
+          </h2>
+          <p className="text-lg text-slate-600 dark:text-slate-300 mb-8">
+            DupeChat is a passion project created to explore authentic AI interactions. Want to see more of my work or get in touch?
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button variant="outline" size="lg" className="px-8 py-3" asChild>
+              <Link href="https://tymur.tech" target="_blank" rel="noopener noreferrer">
+                View My Portfolio or Get In Touch
+              </Link>
+            </Button>
+          </div>
+          
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-6">
+            I'm always interested in feedback and connecting with fellow developers!
+          </p>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 px-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white">
         <div className="container mx-auto max-w-4xl text-center">
