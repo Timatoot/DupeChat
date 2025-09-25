@@ -104,9 +104,18 @@ export default function ChatPage() {
 
     const contentType = res.headers.get("content-type") || "";
     if (contentType.includes("text/event-stream")) {
-      // streaming path
-      const assistantId = `assistant_${Date.now()}`
-      setMessages(prev => [...prev, { id: assistantId, role: "assistant", content: "", timestamp: new Date() }])
+      // streaming path with multi-message splitting
+      let currentMessageId = `assistant_${Date.now()}`
+      let fullContent = ""
+      let currentMessageContent = ""
+      
+      // Add initial empty message
+      setMessages(prev => [...prev, { 
+        id: currentMessageId, 
+        role: "assistant", 
+        content: "", 
+        timestamp: new Date() 
+      }])
 
       const reader = res.body?.getReader()
       const decoder = new TextDecoder()
@@ -128,12 +137,45 @@ export default function ChatPage() {
               const json = JSON.parse(data)
               const delta = json?.choices?.[0]?.delta?.content ?? ""
               if (delta) {
-                setMessages(prev => {
-                  const copy = [...prev]
-                  const idx = copy.findIndex(m => m.id === assistantId)
-                  if (idx !== -1) copy[idx] = { ...copy[idx], content: copy[idx].content + delta }
-                  return copy
-                })
+                fullContent += delta
+                
+                // Check if delta contains newlines
+                if (delta.includes('\n')) {
+                  const parts = delta.split('\n')
+                  currentMessageContent += parts[0]
+                  
+                  // Update current message with content before newline
+                  setMessages(prev => {
+                    const copy = [...prev]
+                    const idx = copy.findIndex(m => m.id === currentMessageId)
+                    if (idx !== -1) copy[idx] = { ...copy[idx], content: currentMessageContent }
+                    return copy
+                  })
+                  
+                  // Create new messages for each line after the first
+                  for (let j = 1; j < parts.length; j++) {
+                    await new Promise(resolve => setTimeout(resolve, 800)) // 800ms delay between messages
+                    
+                    currentMessageId = `assistant_${Date.now()}_${j}`
+                    currentMessageContent = parts[j]
+                    
+                    setMessages(prev => [...prev, {
+                      id: currentMessageId,
+                      role: "assistant",
+                      content: currentMessageContent,
+                      timestamp: new Date(),
+                    }])
+                  }
+                } else {
+                  // No newlines, just append to current message
+                  currentMessageContent += delta
+                  setMessages(prev => {
+                    const copy = [...prev]
+                    const idx = copy.findIndex(m => m.id === currentMessageId)
+                    if (idx !== -1) copy[idx] = { ...copy[idx], content: currentMessageContent }
+                    return copy
+                  })
+                }
               }
             } catch { /* ignore */ }
           }
@@ -144,17 +186,46 @@ export default function ChatPage() {
       // persist final state after stream
       queueMicrotask(() => saveSession((messages as Message[])))
     } else {
-      // JSON path
+      // JSON path with multi-message splitting
       const data = await res.json();
-      const assistantMessage: Message = {
-        id: `assistant_${Date.now()}`,
-        role: "assistant",
-        content: data.content || "",
-        timestamp: new Date(),
-      };
-      const updated = [...base, assistantMessage]
-      setMessages(updated)
-      saveSession(updated)
+      const content = data.content || ""
+      
+      // Split content by newlines and create separate messages
+      const lines = content.split('\n').filter((line: string) => line.trim() !== '')
+      
+      if (lines.length <= 1) {
+        // Single message
+        const assistantMessage: Message = {
+          id: `assistant_${Date.now()}`,
+          role: "assistant",
+          content: content,
+          timestamp: new Date(),
+        };
+        const updated = [...base, assistantMessage]
+        setMessages(updated)
+        saveSession(updated)
+      } else {
+        // Multiple messages with delays
+        let currentMessages = [...base]
+        
+        for (let i = 0; i < lines.length; i++) {
+          if (i > 0) {
+            await new Promise(resolve => setTimeout(resolve, 800)) // 800ms delay between messages
+          }
+          
+          const assistantMessage: Message = {
+            id: `assistant_${Date.now()}_${i}`,
+            role: "assistant",
+            content: lines[i],
+            timestamp: new Date(),
+          };
+          
+          currentMessages = [...currentMessages, assistantMessage]
+          setMessages([...currentMessages])
+        }
+        
+        saveSession(currentMessages)
+      }
     }
 
       track("message_sent"); track("message_received")

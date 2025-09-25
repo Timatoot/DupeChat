@@ -253,11 +253,18 @@ export default function PersonaPreviewPage() {
             <span>Back to Quiz</span>
           </Link>
           <div className="flex items-center space-x-4">
-            <Link href="/quiz">
-              <Button variant="outline" size="sm">
-                Retake Test
-              </Button>
-            </Link>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                // Clear quiz cache before retaking
+                localStorage.removeItem("dd_mirror_v1_quiz")
+                // Navigate to quiz
+                window.location.href = "/quiz"
+              }}
+            >
+              Retake Test
+            </Button>
             {!isEditing && (
               <Button variant="outline" onClick={() => setIsEditing(true)}>
                 <Edit3 className="w-4 h-4 mr-2" />
