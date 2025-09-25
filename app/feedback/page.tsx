@@ -64,7 +64,7 @@ export default function FeedbackPage() {
             </div>
             <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">Thank you!</h1>
             <p className="text-lg text-slate-600 dark:text-slate-400 mb-8">
-              Your feedback helps us improve Doppel. We're constantly working to make your AI twin sound more like you.
+              Your feedback helps us improve DupeChat. We're constantly working to make your AI twin sound more like you.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button onClick={() => router.push("/chat")} size="lg">

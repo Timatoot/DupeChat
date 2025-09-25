@@ -17,7 +17,7 @@ export default function HowItWorksPage() {
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-slate-900 mb-4">How Doppel Works</h1>
+          <h1 className="text-4xl font-bold text-slate-900 mb-4">How DupeChat Works</h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
             Discover how we create your AI twin and why it feels authentically like you
           </p>

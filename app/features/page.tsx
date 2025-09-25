@@ -254,7 +254,7 @@ export default function FeaturesPage() {
             <CardContent className="p-12">
               <h2 className="text-3xl font-bold mb-4">Experience the difference</h2>
               <p className="text-xl mb-8 opacity-90">
-                Unlike generic AI assistants, Doppel creates a truly personal reflection experience
+                Unlike generic AI assistants, DupeChat creates a truly personal reflection experience
               </p>
               <Link href="/quiz">
                 <Button size="lg" className="px-8 py-3 text-lg bg-white text-purple-600 hover:bg-slate-100">

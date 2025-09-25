@@ -134,7 +134,7 @@ export default function DemoPage() {
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">See How Doppel Works</h1>
+          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">See How DupeChat Works</h1>
           <p className="text-xl text-slate-600 dark:text-slate-300">A quick walkthrough of creating your AI twin</p>
         </div>
 

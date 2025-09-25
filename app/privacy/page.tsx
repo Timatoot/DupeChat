@@ -99,7 +99,7 @@ export default function PrivacyPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-slate-700 leading-relaxed">
-                We collect minimal, anonymous analytics to understand how Doppel is used and improve the experience.
+                We collect minimal, anonymous analytics to understand how DupeChat is used and improve the experience.
                 This is completely optional and can be disabled in Settings.
               </p>
 
@@ -136,7 +136,7 @@ export default function PrivacyPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-slate-700 leading-relaxed">You have complete control over your data in Doppel:</p>
+              <p className="text-slate-700 leading-relaxed">You have complete control over your data in DupeChat:</p>
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-3">
@@ -145,7 +145,7 @@ export default function PrivacyPage() {
                     <li>• Export all your data as JSON</li>
                     <li>• Clear all data at any time</li>
                     <li>• Disable analytics tracking</li>
-                    <li>• Use Doppel without any account</li>
+                    <li>• Use DupeChat without any account</li>
                   </ul>
                 </div>
 
