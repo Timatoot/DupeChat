@@ -65,7 +65,7 @@ export default function SettingsPage() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = `doppel-data-export-${new Date().toISOString().split("T")[0]}.json`
+    a.download = `dupechat-data-export-${new Date().toISOString().split("T")[0]}.json`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -129,7 +129,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <Label htmlFor="analytics">Usage Analytics</Label>
-                  <p className="text-sm text-slate-600">Help improve Doppel by sharing anonymous usage data</p>
+                  <p className="text-sm text-slate-600">Help improve DupeChat by sharing anonymous usage data</p>
                 </div>
                 <Switch
                   id="analytics"
@@ -198,12 +198,12 @@ export default function SettingsPage() {
           {/* About */}
           <Card>
             <CardHeader>
-              <CardTitle>About Doppel</CardTitle>
+              <CardTitle>About DupeChat</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3 text-sm text-slate-600">
                 <p>
-                  Doppel creates an AI version of yourself for authentic self-reflection. Your privacy is our priority -
+                  DupeChat creates an AI version of yourself for authentic self-reflection. Your privacy is our priority -
                   all data stays in your browser.
                 </p>
                 <div className="flex justify-between items-center pt-2 border-t">

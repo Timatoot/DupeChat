@@ -18,7 +18,7 @@ export default function PrivacyPage() {
         <div className="text-center mb-12">
           <Shield className="w-16 h-16 text-purple-600 mx-auto mb-6" />
           <h1 className="text-4xl font-bold text-slate-900 mb-4">Privacy Policy</h1>
-          <p className="text-xl text-slate-600">Your privacy is fundamental to how Doppel works</p>
+          <p className="text-xl text-slate-600">Your privacy is fundamental to how DupeChat works</p>
         </div>
 
         <div className="space-y-8">
@@ -43,7 +43,7 @@ export default function PrivacyPage() {
                   <li>• Your conversations are completely private</li>
                   <li>• We can't see or access your personal data</li>
                   <li>• Your data is tied to this specific browser</li>
-                  <li>• Clearing browser data will delete your Doppel data</li>
+                  <li>• Clearing browser data will delete your DupeChat data</li>
                 </ul>
               </div>
             </CardContent>

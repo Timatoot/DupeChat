@@ -15,7 +15,7 @@ export default function LandingPage() {
             <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
               <MessageCircle className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-slate-900 dark:text-white">Doppel</span>
+            <span className="text-xl font-bold text-slate-900 dark:text-white">DupeChat</span>
           </div>
           <nav className="hidden md:flex items-center space-x-6">
             <Link
@@ -82,10 +82,10 @@ export default function LandingPage() {
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
-              Why Doppel is different
+              Why DupeChat is different
             </h2>
             <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-              Unlike generic AI assistants, Doppel learns your unique voice, values, and quirks to create authentic
+              Unlike generic AI assistants, DupeChat learns your unique voice, values, and quirks to create authentic
               conversations with yourself.
             </p>
           </div>
@@ -241,7 +241,7 @@ export default function LandingPage() {
             <div className="bg-slate-800 p-6 rounded-xl">
               <h3 className="text-lg font-semibold mb-3 text-purple-400">No Accounts Required</h3>
               <p className="text-slate-300">
-                Start using Doppel immediately without creating an account, providing an email, or sharing any personal
+                Start using DupeChat immediately without creating an account, providing an email, or sharing any personal
                 information.
               </p>
             </div>
@@ -275,7 +275,7 @@ export default function LandingPage() {
               <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-pink-500 rounded flex items-center justify-center">
                 <MessageCircle className="w-4 h-4 text-white" />
               </div>
-              <span className="text-lg font-semibold text-white">Doppel</span>
+              <span className="text-lg font-semibold text-white">DupeChat</span>
             </div>
 
             <div className="flex space-x-6 text-sm">
@@ -289,7 +289,7 @@ export default function LandingPage() {
           </div>
 
           <div className="border-t border-slate-800 mt-8 pt-8 text-center text-sm">
-            <p>&copy; 2024 Doppel. Your AI twin for authentic self-reflection.</p>
+            <p>&copy; 2024 DupeChat. Your AI twin for authentic self-reflection.</p>
           </div>
         </div>
       </footer>

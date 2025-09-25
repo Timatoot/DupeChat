@@ -258,7 +258,7 @@ export default function ChatPage() {
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
-    a.href = url; a.download = `doppel-chat-${sessionId}.json`; a.click()
+    a.href = url; a.download = `dupechat-${sessionId}.json`; a.click()
     URL.revokeObjectURL(url)
     track("export_data")
   }

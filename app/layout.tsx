@@ -7,7 +7,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Doppel - Your AI Twin for Authentic Self-Reflection",
+  title: "DupeChat - Your AI Twin for Authentic Conversations",
   description:
     "Create an AI version of yourself that thinks, speaks, and reflects like you do. A safe space to explore your thoughts with your digital twin.",
 }
