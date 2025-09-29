@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { checkRateLimit, incrementMessageCount, exportChatHistory } from "@/lib/chat-utils"
 import { Brain, Home, RotateCcw, Download, Send, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -23,6 +24,7 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isInitializing, setIsInitializing] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [rateLimitInfo, setRateLimitInfo] = useState<{ allowed: boolean; remaining: number; resetsAt: Date } | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
 
@@ -33,6 +35,9 @@ export default function ChatPage() {
       router.push("/quiz")
       return
     }
+
+    // Check rate limit (async)
+    checkRateLimit().then(setRateLimitInfo)
 
     // Load existing messages or create welcome message
     const savedMessages = localStorage.getItem("dupeChat_messages")
@@ -69,6 +74,15 @@ export default function ChatPage() {
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return
 
+    // Check rate limit before sending
+    const rateLimit = await checkRateLimit()
+    setRateLimitInfo(rateLimit)
+    
+    if (!rateLimit.allowed) {
+      setError(`Daily message limit reached (${20 - rateLimit.remaining}/20). Resets at ${rateLimit.resetsAt.toLocaleTimeString()}.`)
+      return
+    }
+
     // optimistic user message
     const userMessage: Message = {
       id: `user_${Date.now()}`,
@@ -97,6 +111,11 @@ export default function ChatPage() {
       })
 
       if (!response.ok) {
+        if (response.status === 429) {
+          // Handle rate limit error from server
+          const errorData = await response.json().catch(() => ({}))
+          throw new Error(errorData.message || "Rate limit exceeded")
+        }
         throw new Error(`HTTP ${response.status}`)
       }
 
@@ -156,6 +175,8 @@ export default function ChatPage() {
       setMessages(prev => prev.slice(0, -1))
     } finally {
       setIsLoading(false)
+      // Update rate limit info after message is sent
+      checkRateLimit().then(setRateLimitInfo)
     }
   }
 
@@ -180,16 +201,7 @@ export default function ChatPage() {
   }
 
   const handleExportChat = () => {
-    const exportData = { messages, exportedAt: new Date().toISOString() }
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = `dupechat-conversation-${new Date().toISOString().split("T")[0]}.json`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
+    exportChatHistory(messages)
   }
 
   if (isInitializing) {
@@ -209,7 +221,14 @@ export default function ChatPage() {
             <Brain className="h-8 w-8 text-primary" />
             <div>
               <span className="text-2xl font-bold text-foreground">DupeChat</span>
-              <p className="text-xs text-muted-foreground">Chatting with your AI twin</p>
+              <div className="flex items-center gap-4">
+                <p className="text-xs text-muted-foreground">Chatting with your AI twin</p>
+                {rateLimitInfo && (
+                  <p className="text-xs text-muted-foreground">
+                    Messages: {20 - rateLimitInfo.remaining}/20 daily
+                  </p>
+                )}
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -283,14 +302,14 @@ export default function ChatPage() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Type your message..."
-                disabled={isLoading}
+                placeholder={rateLimitInfo && !rateLimitInfo.allowed ? "Daily message limit reached" : "Type your message..."}
+                disabled={isLoading || (rateLimitInfo?.allowed === false)}
                 className="resize-none min-h-[44px] max-h-32"
               />
             </div>
             <Button
               onClick={handleSendMessage}
-              disabled={!inputValue.trim() || isLoading}
+              disabled={!inputValue.trim() || isLoading || (rateLimitInfo?.allowed === false)}
               size="lg"
               className="px-6"
             >

@@ -7,6 +7,14 @@ export interface Message {
   timestamp: Date
 }
 
+export interface DailyUsage {
+  date: string
+  messageCount: number
+}
+
+const DAILY_MESSAGE_LIMIT = 20
+const RATE_LIMIT_KEY = "dupeChat_dailyUsage"
+
 export function generatePersonaPrompt(answers: QuizAnswers): string {
   const textingStyle = answers.texting_style || "casual"
   const phrases = answers.phrases || ""
@@ -62,6 +70,33 @@ Rules:
                 User: i think i fumbled  
                 Bot: bruh  
                 Bot: what happened?`
+}
+
+export async function checkRateLimit(): Promise<{ allowed: boolean; remaining: number; resetsAt: Date }> {
+  try {
+    const response = await fetch('/api/rate-limit')
+    const data = await response.json()
+    
+    return {
+      allowed: data.allowed,
+      remaining: data.remaining,
+      resetsAt: new Date(data.resetTime)
+    }
+  } catch (error) {
+    console.error('Failed to check rate limit:', error)
+    // Fallback - assume allowed if server check fails
+    return {
+      allowed: true,
+      remaining: DAILY_MESSAGE_LIMIT,
+      resetsAt: new Date()
+    }
+  }
+}
+
+// This function is no longer needed since the server handles incrementing
+export function incrementMessageCount(): void {
+  // Server handles incrementing automatically when messages are sent
+  // This function is kept for compatibility but does nothing
 }
 
 export function exportChatHistory(messages: Message[]): void {

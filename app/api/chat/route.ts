@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { GoogleGenAI } from "@google/genai";
+import { getClientIP, checkRateLimit, incrementRateLimit, DAILY_LIMIT } from "@/lib/rate-limit";
 
 export const runtime = "nodejs"; // Gemini SDK needs Node environment
 
@@ -11,6 +12,31 @@ function j(status: number, message: string) {
 }
 
 export async function POST(req: NextRequest) {
+  // Check rate limit first
+  const clientIP = getClientIP(req);
+  const rateLimitStatus = checkRateLimit(clientIP);
+  
+  if (!rateLimitStatus.allowed) {
+    const resetDate = new Date(rateLimitStatus.resetTime).toLocaleString();
+    return new Response(
+      JSON.stringify({ 
+        error: "Rate limit exceeded", 
+        message: `Daily limit of ${DAILY_LIMIT} messages reached. Resets at ${resetDate}`,
+        resetTime: rateLimitStatus.resetTime,
+        remaining: rateLimitStatus.remaining
+      }),
+      {
+        status: 429,
+        headers: { 
+          "content-type": "application/json",
+          "X-RateLimit-Limit": DAILY_LIMIT.toString(),
+          "X-RateLimit-Remaining": rateLimitStatus.remaining.toString(),
+          "X-RateLimit-Reset": rateLimitStatus.resetTime.toString()
+        },
+      }
+    );
+  }
+
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return j(500, "Server missing GEMINI_API_KEY");
 
@@ -71,6 +97,9 @@ export async function POST(req: NextRequest) {
           }
           controller.enqueue(encoder.encode(`data: [DONE]\n\n`));
           controller.close();
+          
+          // Increment rate limit after successful response
+          incrementRateLimit(clientIP);
         } catch (e) {
           controller.error(e);
         }
